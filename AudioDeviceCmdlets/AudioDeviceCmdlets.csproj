@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultAudioCmdlets.cs" />
+    <Compile Include="EDataFlowExtensions.cs" />
+    <Compile Include="ERoleExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

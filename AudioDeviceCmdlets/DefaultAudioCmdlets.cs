@@ -33,11 +33,41 @@ namespace AudioDeviceCmdlets
     [Cmdlet(VerbsCommon.Get, "DefaultAudioDevice")]
     public class GetDefaultAudioDevice : Cmdlet
     {
+        [ValidateSet("Playback", "Recording")]
+        [Parameter(Mandatory = false, Position = 0)]
+        public string DeviceType
+        {
+            get
+            {
+                return MMType.ToFriendlyString();
+            }
+            set
+            {
+                MMType = EDataFlowExtensions.ToEDataFlow(value);
+            }
+        }
+        private EDataFlow MMType = EDataFlow.eRender;
+
+        [ValidateSet("Communications", "Console", "Multimedia")]
+        [Parameter(Mandatory = false, Position = 0)]
+        public string Role
+        {
+            get
+            {
+                return MMRole.ToFriendlyString();
+            }
+            set
+            {
+                MMRole = ERoleExtensions.ToERole(value);
+            }
+        }
+        private ERole MMRole = ERole.eMultimedia;
+
         protected override void ProcessRecord()
         {
             MMDeviceEnumerator DevEnum = new MMDeviceEnumerator();
-            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(EDataFlow.eRender, EDeviceState.DEVICE_STATE_ACTIVE);
-            MMDevice DefaultDevice = DevEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(MMType, EDeviceState.DEVICE_STATE_ACTIVE);
+            MMDevice DefaultDevice = DevEnum.GetDefaultAudioEndpoint(MMType, MMRole);
 
             for (int i = 0; i < devices.Count; i++)
             {
@@ -53,6 +83,36 @@ namespace AudioDeviceCmdlets
     [Cmdlet(VerbsCommon.Set, "DefaultAudioDevice")]
     public class SetDefaultAudioDevice : Cmdlet
     {
+        [ValidateSet("Playback", "Recording")]
+        [Parameter(Mandatory = false, Position = 0)]
+        public string DeviceType
+        {
+            get
+            {
+                return MMType.ToFriendlyString();
+            }
+            set
+            {
+                MMType = EDataFlowExtensions.ToEDataFlow(value);
+            }
+        }
+        private EDataFlow MMType = EDataFlow.eRender;
+
+        [ValidateSet("Communications", "Console", "Multimedia")]
+        [Parameter(Mandatory = false, Position = 0)]
+        public string Role
+        {
+            get
+            {
+                return MMRole.ToFriendlyString();
+            }
+            set
+            {
+                MMRole = ERoleExtensions.ToERole(value);
+            }
+        }
+        private ERole MMRole = ERole.eMultimedia;
+
         [Alias("DeviceIndex")]
         [ValidateRange(0, 9)]
         [Parameter(Mandatory = true, Position = 0, ParameterSetName="Index")]
@@ -84,7 +144,7 @@ namespace AudioDeviceCmdlets
         protected override void ProcessRecord()
         {
             MMDeviceEnumerator DevEnum = new MMDeviceEnumerator();
-            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(EDataFlow.eRender, EDeviceState.DEVICE_STATE_ACTIVE);
+            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(MMType, EDeviceState.DEVICE_STATE_ACTIVE);
             
             PolicyConfigClient client = new PolicyConfigClient();
 
@@ -112,8 +172,7 @@ namespace AudioDeviceCmdlets
                 }
             }
 
-            client.SetDefaultEndpoint(devices[index].ID, ERole.eCommunications);
-            client.SetDefaultEndpoint(devices[index].ID, ERole.eMultimedia);
+            client.SetDefaultEndpoint(devices[index].ID, MMRole);
 
             WriteObject(new AudioDevice(index, devices[index]));
         }
@@ -122,10 +181,25 @@ namespace AudioDeviceCmdlets
     [Cmdlet(VerbsCommon.Get, "AudioDeviceList")]
     public class GetAudioDeviceList : Cmdlet
     {
+        [ValidateSet("Playback", "Recording")]
+        [Parameter(Mandatory = false, Position = 0)]
+        public string DeviceType
+        {
+            get
+            {
+                return MMType.ToFriendlyString();
+            }
+            set
+            {
+                MMType = EDataFlowExtensions.ToEDataFlow(value);
+            }
+        }
+        private EDataFlow MMType = EDataFlow.eRender;
+
         protected override void ProcessRecord()
         {
             MMDeviceEnumerator DevEnum = new MMDeviceEnumerator();
-            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(EDataFlow.eRender, EDeviceState.DEVICE_STATE_ACTIVE);
+            MMDeviceCollection devices = DevEnum.EnumerateAudioEndPoints(MMType, EDeviceState.DEVICE_STATE_ACTIVE);
 
             for (int i = 0; i < devices.Count; i++)
             {
